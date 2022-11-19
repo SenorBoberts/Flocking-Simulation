@@ -12,9 +12,12 @@ async fn main() {
         flock.push(boid::Boid::new());
     }
     loop{    
+        let cflock = flock.clone();
         for i in 0..NUM_AGENTS{
-            let steer = boid::get_steer(&flock[i], &flock);
-            flock[i].align(steer);
+            let align = boid::get_align(&flock[i], &cflock);
+            let co = boid::get_co(&flock[i], &cflock);
+            let sep = boid::get_sep(&flock[i], &cflock);
+            flock[i].flock(align, co, sep);
             flock[i].update();
             flock[i].draw();
         }
