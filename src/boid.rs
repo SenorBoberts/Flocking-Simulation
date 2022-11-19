@@ -1,5 +1,7 @@
 use macroquad::prelude::*;
 
+const MAX_STEER: f32 = 0.1;
+
 #[derive (PartialEq, Clone, Copy)]
 pub struct Boid{
     pos: Vec2,
@@ -25,17 +27,17 @@ impl Boid{
     }
 
     pub fn check_edges(&mut self){
-        if self.pos.x > screen_width() {
-            self.pos.x = 0f32;
+        if self.pos.x > screen_width() + self.size{
+            self.pos.x = 0f32 - self.size;
         }
-        if self.pos.x < 0f32 {
-            self.pos.x = screen_width();
+        if self.pos.x < 0f32 - self.size{
+            self.pos.x = screen_width() + self.size;
         }
-        if self.pos.y > screen_height(){
-            self.pos.y = 0f32;
+        if self.pos.y > screen_height() + self.size{
+            self.pos.y = 0f32 - self.size;
         }
-        if self.pos.y < 0f32 {
-            self.pos.y = screen_height();
+        if self.pos.y < 0f32 - self.size{
+            self.pos.y = screen_height() + self.size;
         }
     }
     
@@ -63,7 +65,7 @@ impl Boid{
         if total > 0{
             avg = avg / Vec2::new(total as f32, total as f32);
             avg -= b.vel;
-            //add a limit
+            avg.clamp_length_max(MAX_STEER);
         }
         return avg;
     }
