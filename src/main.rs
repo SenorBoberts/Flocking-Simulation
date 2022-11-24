@@ -17,7 +17,7 @@ async fn main() {
             flock[i].flock(steer);
             flock[i].update();
             flock[i].draw();
-        }
+        } 
         next_frame().await
     }
 }

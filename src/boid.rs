@@ -1,4 +1,5 @@
 use macroquad::prelude::*;
+use std::f32::consts::PI;
 
 const MAX_STEER: f32 = 0.1;
 const MAX_SPEED: f32 = 4f32;
@@ -16,10 +17,10 @@ impl Boid{
     pub fn new() -> Self{
         Self{
             pos: Vec2::new(rand::gen_range(0.0, screen_width()), rand::gen_range(0.0, screen_height())),
-            vel: Vec2::new(rand::gen_range(-4f32, 4f32), rand::gen_range(-4f32, 4f32)).normalize(),
+            vel: Vec2::new(rand::gen_range(-4f32, 4f32), rand::gen_range(-4f32, 4f32)),
             acl: Vec2::new(0f32, 0f32),
-            size: 5f32,
-            rad: 25f32
+            size: 10f32,
+            rad: 15f32
         }
     }
 
@@ -51,7 +52,10 @@ impl Boid{
     }
     
     pub fn draw(&self){
-        draw_circle(self.pos.x, self.pos.y, self.size, WHITE);
+        let test_vec = self.vel.normalize();
+        let rot_vec = Vec2::from_angle(PI * (7f32/8f32)).rotate(test_vec);
+        let rot_vec2 = Vec2::from_angle(PI * (9f32/8f32)).rotate(test_vec);
+        draw_triangle(self.pos, self.pos + rot_vec * self.size, self.pos + rot_vec2 * self.size, WHITE);
     }
 }
 
@@ -79,19 +83,19 @@ pub fn get_steer(b: &Boid, others: &Vec<Boid>) -> Vec2{
     }
     if total > 0{
         align = align / Vec2::new(total as f32, total as f32);
-        align = align.clamp_length(MAX_SPEED, MAX_SPEED);
+        align = align * (MAX_SPEED / align.length());
         align -= b.vel;
         align = align.clamp_length_max(MAX_STEER);
 
         sep = sep / Vec2::new(total as f32, total as f32);
-        sep = sep.clamp_length(MAX_SPEED,MAX_SPEED);
+        sep = sep * (MAX_SPEED / sep.length());
         sep -= b.vel;
         sep = sep.clamp_length_max(MAX_STEER);
     }
 
     if co_total > 0{
         co = co / Vec2::new(co_total as f32, co_total as f32);
-        co = co.clamp_length(MAX_SPEED,MAX_SPEED);
+        co = co * (MAX_SPEED / co.length());
         co -= b.pos;
         co -= b.vel;
         co = co.clamp_length_max(MAX_STEER);
